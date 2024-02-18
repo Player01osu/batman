@@ -51,7 +51,14 @@ fn main() {
         getmaxyx(stdscr(), &mut max_y, &mut max_x);
 
         loop {
+
             getyx(stdscr(), &mut y, &mut x);
+            let c = getch() as u8 as char;
+            if c == '\n' { break }
+            s.push(c);
+            x += 1;
+
+            /*
             let c = match get_wch() {
                 Some(c) => c,
                 None => break,
@@ -80,6 +87,7 @@ fn main() {
                 _ => {
                 }
             }
+            */
             wmove(stdscr(), y, 0);
             clrtoeol();
             addstr(&s);
