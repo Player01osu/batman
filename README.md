@@ -8,5 +8,5 @@ This project has nothing to do with batman.
 You need ncurses
 
 ```console
-cargo run
+NCURSES_RS_RUSTC_LINK_LIB=/usr/include/ncursesw/curses.h cargo run
 ```
