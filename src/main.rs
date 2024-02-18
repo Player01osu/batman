@@ -3,6 +3,7 @@ use lexer::Lexer;
 #[allow(unused_imports)]
 use ncurses::*;
 use parser::Parser;
+use stage::Stage;
 
 use crate::lexer::TokenKind;
 
@@ -28,19 +29,26 @@ fn _test_parser() {
 fn main() {
     initscr();
 
-    let mut game = Game::new();
-
     cbreak();
     noecho();
+    initscr();
+    scrollok(stdscr(), true);
     keypad(stdscr(), true);
 
-    addstr("Welcome!\n");
     let mut s = String::new();
     let mut x = 0;
     let mut y = 0;
 
+    let mut max_x = 0;
+    let mut max_y = 0;
+
+    let mut game = Game::new();
+
+    game.transition(Stage::First);
+
     while game.is_running() {
         getyx(stdscr(), &mut y, &mut x);
+        getmaxyx(stdscr(), &mut max_y, &mut max_x);
 
         loop {
             getyx(stdscr(), &mut y, &mut x);
@@ -61,7 +69,8 @@ fn main() {
                     s.remove(x as usize);
                 }
                 WchResult::Char(c) if char::from_u32(c).unwrap() == '\n' => {
-                    wmove(stdscr(), y + 1, 0);
+                    y += 1;
+                    wmove(stdscr(), y, 0);
                     break;
                 }
                 WchResult::Char(c) => {
@@ -78,7 +87,12 @@ fn main() {
             refresh();
         }
 
-        game.eval(&s).unwrap();
+        if y >= max_y {
+            wmove(stdscr(), y + 1, 0);
+            scrl(10);
+        }
+
+        game.eval(&s);
         refresh();
         s.clear();
     }

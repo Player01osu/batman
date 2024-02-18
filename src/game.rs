@@ -1,18 +1,14 @@
 use ncurses::*;
 
-use crate::{lexer::{NounKind, VerbKind}, parser::{Expr, GameExpr, ParseErr, Parser, ProgramExpr}};
+use crate::{lexer::{NounKind, VerbKind}, parser::{Expr, GameExpr, ParseErr, Parser, ProgramExpr}, stage::{Stage, State}};
 
 #[derive(Debug)]
 pub struct Game {
-    is_running: bool,
-    no_parse: bool,
-    name: String,
-    stage: Stage,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub enum Stage {
-    First
+    pub is_running: bool,
+    pub parse_mode: ParseMode,
+    pub name: String,
+    pub stage: Stage,
+    pub state: State,
 }
 
 #[derive(Clone, Debug)]
@@ -30,79 +26,145 @@ impl From<ParseErr> for GameErr {
 
 const HELP: &str = include_str!("../help.txt");
 
-fn print_help() {
-    addstr(HELP);
+#[derive(Debug, Clone, Copy)]
+pub enum ParseMode {
+    Grammar,
+    Raw,
+    Confirm,
+}
+
+pub fn msg(s: &str) {
+    clear();
+    addstr(&format!("{s}\nPress any key to continue...\n"));
+    getch();
+}
+
+pub fn oops() {
+    msg("Can't use that here; try 'help' or 'hint'\n");
 }
 
 impl Game {
     pub fn new() -> Self {
         Self {
             is_running: true,
-            no_parse: false,
+            parse_mode: ParseMode::Grammar,
             name: "Jeff".to_string(),
             stage: Stage::First,
+            state: Default::default(),
         }
+    }
+
+    pub fn print_help(&mut self) {
+        clear();
+        addstr(&format!("{HELP}\n\nPress any key to continue..."));
+        getch();
+        refresh();
+        self.transition(self.stage);
     }
 
     pub fn is_running(&self) -> bool {
         self.is_running
     }
 
-    fn eval_program_exit(&mut self, program: ProgramExpr) -> Result<()> {
+    fn eval_program_exit(&mut self, program: ProgramExpr) {
         match program.noun() {
             NounKind::Game => self.is_running = false,
             _ => unimplemented!(),
         }
-        Ok(())
     }
 
-    fn eval_program(&mut self, program: ProgramExpr) -> Result<()> {
+    fn eval_program(&mut self, program: ProgramExpr) {
         match program.verb() {
             VerbKind::Exit => self.eval_program_exit(program),
             _ => unimplemented!()
         }
     }
 
-    fn eval_raw(&mut self, s: String) -> Result<()> {
-        Ok(())
-    }
-
-    fn eval_game(&mut self, game: GameExpr) -> Result<()> {
-        match self.stage {
+    fn eval_game(&mut self, game: GameExpr) {
+        let next_stage = match self.stage {
             Stage::First => {
                 self.eval_first(game)
             }
-        }
+            Stage::PlayConfirm => {
+                self.eval_playconfirm(game)
+            }
+            Stage::Library => {
+                self.eval_library(game)
+            }
+            Stage::Quit => {
+                Stage::Quit
+            }
+            Stage::OutsideLibrary => {
+                self.eval_outside_library(game)
+            }
+        };
+        self.transition(next_stage);
     }
 
-    pub fn eval(&mut self, s: &str) -> Result<()> {
+    pub fn eval_outside_library(&mut self, game: GameExpr) -> Stage {
+        self.stage
+    }
+
+    pub fn eval(&mut self, s: &str) {
+        match s.trim().to_ascii_lowercase().as_str() {
+            "help" => {
+                self.print_help();
+                return;
+            }
+            "hint" => {
+                self.print_hint();
+                return;
+            }
+            _ => ()
+        }
+
         let expr = {
-            if self.no_parse {
-                self.no_parse = false;
-                Expr::Raw(s.to_string())
-            } else {
-                let mut parser = Parser::new(s);
-                match parser.next()? {
-                    Some(v) => v,
-                    None => return Ok(()),
+            match self.parse_mode {
+                ParseMode::Raw => {
+                    Expr::Game(GameExpr::Raw(s.to_string()))
+                }
+                ParseMode::Grammar => {
+                    let mut parser = Parser::new(s);
+                    match parser.next() {
+                        Ok(Some(v)) => v,
+                        Ok(None) => return,
+                        Err(ParseErr::Unexpected((_, _))) => {
+                            addstr("Unknown command, try 'help' or 'hint'\n");
+                            return;
+                        }
+                        Err(ParseErr::Unimplemented) => {
+                            return;
+                        }
+                        Err(e) => {
+                            addstr(e.to_string().as_str());
+                            addstr("\n");
+                            return;
+                        }
+                    }
+                }
+                ParseMode::Confirm => {
+                    match s.trim().to_ascii_lowercase().as_str() {
+                        "yes" | "true" | "ok" => Expr::Game(GameExpr::Confirm(true)),
+                        "no" | "false" | "nope" => Expr::Game(GameExpr::Confirm(false)),
+                        _ => {
+                            addstr("Invalid option: try yes or no\n");
+                            return
+                        }
+                    }
                 }
             }
         };
 
         match expr {
-            Expr::Raw(raw) => {
-                self.eval_raw(raw)?;
-            }
             Expr::Game(game) => {
-                self.eval_game(game)?;
+                self.eval_game(game);
             }
             Expr::Program(program) => {
-                self.eval_program(program)?;
+                self.eval_program(program);
             }
-            Expr::Help => print_help(),
+            Expr::Help => self.print_help(),
             Expr::Hint => todo!(),
             _ => unimplemented!(),
         }
-        Ok(())
     }
 }

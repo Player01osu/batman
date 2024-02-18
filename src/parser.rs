@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 use crate::lexer::{AdjKind, AdverbKind, Lexer, NounKind, Token, TokenKind, VerbKind};
+use thiserror::Error;
 
 #[derive(Debug, Clone)]
 pub struct Parser<'a> {
@@ -7,10 +8,15 @@ pub struct Parser<'a> {
 }
 
 #[derive(Debug, Clone)]
-pub struct GameExpr {
-    verb: VerbKind,
-    noun: NounKind,
-    adverb: Option<AdverbKind>,
+pub enum GameExpr {
+    Svn {
+        verb: VerbKind,
+        noun: NounKind,
+        adverb: Option<AdverbKind>,
+        adj: Option<AdjKind>,
+    },
+    Raw(String),
+    Confirm(bool),
 }
 
 #[derive(Debug, Clone)]
@@ -27,24 +33,27 @@ pub enum Expr {
     Confirm(bool),
     Help,
     Hint,
-
-    Raw(String),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Error, Debug, Clone)]
 pub enum ParseErr {
+    #[error("Unexpected token")]
     Unexpected((TokenKind, TokenKind)),
+
+    #[error("Missing verb")]
+    MissingVerb,
+
+    #[error("Missing noun")]
+    MissingNoun,
+
+    #[error("Bad Grammar; make sure it's in Subject Object Verb form")]
+    BadGrammar,
+
+    #[error("Internal unimplemented")]
+    Unimplemented,
 }
 
 type Result<T> = std::result::Result<T, ParseErr>;
-
-fn is_game_verb(verb: VerbKind) -> bool {
-    true
-}
-
-fn is_program_verb(verb: VerbKind) -> bool {
-    true
-}
 
 fn is_exit_game(verb: VerbKind, noun: NounKind) -> bool {
     matches!(verb, VerbKind::Close | VerbKind::Quit | VerbKind::Exit)
@@ -127,7 +136,9 @@ impl<'a> Parser<'a> {
                 let adverb_token = self.expect_adverb()?;
                 Ok((None, noun, adverb_token))
             }
-            _ => unimplemented!(),
+            _ => {
+                Err(ParseErr::MissingNoun)
+            }
         }
     }
 
@@ -139,68 +150,12 @@ impl<'a> Parser<'a> {
                 noun,
                 adverb,
             }))),
-            (VerbKind::Get, NounKind::Chair) => todo!(),
-            (VerbKind::Get, NounKind::Door) => todo!(),
-            (VerbKind::Get, NounKind::Stair) => todo!(),
-            (VerbKind::Get, NounKind::Weapon) => todo!(),
-            (VerbKind::Get, NounKind::Homework) => todo!(),
-            (VerbKind::Get, NounKind::Computer) => todo!(),
-            (VerbKind::Get, NounKind::Game) => todo!(),
-            (VerbKind::Get, NounKind::Dummy) => todo!(),
-            (VerbKind::Open, NounKind::Chair) => todo!(),
-            (VerbKind::Open, NounKind::Door) => todo!(),
-            (VerbKind::Open, NounKind::Stair) => todo!(),
-            (VerbKind::Open, NounKind::Weapon) => todo!(),
-            (VerbKind::Open, NounKind::Homework) => todo!(),
-            (VerbKind::Open, NounKind::Computer) => todo!(),
-            (VerbKind::Open, NounKind::Game) => todo!(),
-            (VerbKind::Open, NounKind::Dummy) => todo!(),
-            (VerbKind::Close, NounKind::Chair) => todo!(),
-            (VerbKind::Close, NounKind::Door) => todo!(),
-            (VerbKind::Close, NounKind::Stair) => todo!(),
-            (VerbKind::Close, NounKind::Weapon) => todo!(),
-            (VerbKind::Close, NounKind::Homework) => todo!(),
-            (VerbKind::Close, NounKind::Computer) => todo!(),
-            (VerbKind::Close, NounKind::Dummy) => todo!(),
-            (VerbKind::Exit, NounKind::Chair) => todo!(),
-            (VerbKind::Exit, NounKind::Door) => todo!(),
-            (VerbKind::Exit, NounKind::Stair) => todo!(),
-            (VerbKind::Exit, NounKind::Weapon) => todo!(),
-            (VerbKind::Exit, NounKind::Homework) => todo!(),
-            (VerbKind::Exit, NounKind::Computer) => todo!(),
-            (VerbKind::Exit, NounKind::Dummy) => todo!(),
-            (VerbKind::Go, NounKind::Chair) => todo!(),
-            (VerbKind::Go, NounKind::Door) => todo!(),
-            (VerbKind::Go, NounKind::Stair) => todo!(),
-            (VerbKind::Go, NounKind::Weapon) => todo!(),
-            (VerbKind::Go, NounKind::Homework) => todo!(),
-            (VerbKind::Go, NounKind::Computer) => todo!(),
-            (VerbKind::Go, NounKind::Game) => todo!(),
-            (VerbKind::Go, NounKind::Dummy) => todo!(),
-            (VerbKind::Dummy, NounKind::Chair) => todo!(),
-            (VerbKind::Dummy, NounKind::Door) => todo!(),
-            (VerbKind::Dummy, NounKind::Stair) => todo!(),
-            (VerbKind::Dummy, NounKind::Weapon) => todo!(),
-            (VerbKind::Dummy, NounKind::Homework) => todo!(),
-            (VerbKind::Dummy, NounKind::Computer) => todo!(),
-            (VerbKind::Dummy, NounKind::Game) => todo!(),
-            (VerbKind::Dummy, NounKind::Dummy) => todo!(),
-            (VerbKind::Hit, NounKind::Chair) => todo!(),
-            (VerbKind::Hit, NounKind::Door) => todo!(),
-            (VerbKind::Hit, NounKind::Stair) => todo!(),
-            (VerbKind::Hit, NounKind::Weapon) => todo!(),
-            (VerbKind::Hit, NounKind::Homework) => todo!(),
-            (VerbKind::Hit, NounKind::Computer) => todo!(),
-            (VerbKind::Hit, NounKind::Game) => todo!(),
-            (VerbKind::Hit, NounKind::Dummy) => todo!(),
-            (VerbKind::Quit, NounKind::Chair) => todo!(),
-            (VerbKind::Quit, NounKind::Door) => todo!(),
-            (VerbKind::Quit, NounKind::Stair) => todo!(),
-            (VerbKind::Quit, NounKind::Weapon) => todo!(),
-            (VerbKind::Quit, NounKind::Homework) => todo!(),
-            (VerbKind::Quit, NounKind::Computer) => todo!(),
-            (VerbKind::Quit, NounKind::Dummy) => todo!(),
-            v => unimplemented!("{v:?}"),
+            _ => Ok(Some(Expr::Game(GameExpr::Svn {
+                verb,
+                noun,
+                adj,
+                adverb,
+            }))),
         }
     }
 

@@ -22,6 +22,13 @@ pub enum NounKind {
     Homework,
     Computer,
     Game,
+    Building,
+    Stats,
+    Foot,
+    Bus,
+    Back,
+    Nothing,
+    Bathroom,
 
     Dummy,
 }
@@ -35,6 +42,14 @@ pub enum VerbKind {
     Quit,
     Go,
     Hit,
+    Leave,
+    Check,
+    Continue,
+    Wait,
+    Board,
+    Enter,
+    Head,
+    Do,
 
     Dummy,
 }
@@ -127,6 +142,14 @@ impl<'a> Lexer<'a> {
             "go" => TokenKind::Verb(VerbKind::Go),
             "hit" => TokenKind::Verb(VerbKind::Hit),
             "quit" => TokenKind::Verb(VerbKind::Quit),
+            "leave" => TokenKind::Verb(VerbKind::Leave),
+            "check" => TokenKind::Verb(VerbKind::Check),
+            "continue" => TokenKind::Verb(VerbKind::Continue),
+            "wait" => TokenKind::Verb(VerbKind::Wait),
+            "board" => TokenKind::Verb(VerbKind::Board),
+            "enter" => TokenKind::Verb(VerbKind::Enter),
+            "head" => TokenKind::Verb(VerbKind::Head),
+            "do" => TokenKind::Verb(VerbKind::Do),
 
             // Nouns
             "chair" => TokenKind::Noun(NounKind::Chair),
@@ -136,6 +159,13 @@ impl<'a> Lexer<'a> {
             "homework" => TokenKind::Noun(NounKind::Homework),
             "computer" => TokenKind::Noun(NounKind::Computer),
             "game" => TokenKind::Noun(NounKind::Game),
+            "building" => TokenKind::Noun(NounKind::Building),
+            "stats" => TokenKind::Noun(NounKind::Stats),
+            "foot" => TokenKind::Noun(NounKind::Foot),
+            "bus" => TokenKind::Noun(NounKind::Bus),
+            "back" => TokenKind::Noun(NounKind::Back),
+            "nothing" => TokenKind::Noun(NounKind::Nothing),
+            "bathroom" => TokenKind::Noun(NounKind::Bathroom),
 
             // Adverbs
             "quick" => TokenKind::Adverb(AdverbKind::Quick),
@@ -154,6 +184,8 @@ impl<'a> Lexer<'a> {
             "the" => TokenKind::Article,
             "a" => TokenKind::Article,
             "an" => TokenKind::Article,
+            "for" => TokenKind::Article,
+            "to" => TokenKind::Article,
 
             _ => TokenKind::Illegal,
         }

@@ -1,42 +1,6 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NounKind {
-    Chair,
-    Door,
-    Stair,
-    Weapon,
-    Homework,
-    Computer,
-    Game,
+help - Prints this
+hint - Prints stage related hints
+rewind time - Goes back one step
+exit game - Exits the game
 
-    Dummy,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VerbKind {
-    Get,
-    Open,
-    Close,
-    Exit,
-    Quit,
-    Go,
-    Hit,
-
-    Dummy,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AdverbKind {
-    Quick,
-    Slow,
-    Careful,
-    Intense,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AdjKind {
-    Near,
-    Far,
-    Strong,
-    Weak,
-    Away,
-}
+Grammar Explanation: Verb [Adjective] Object [Adverb]
