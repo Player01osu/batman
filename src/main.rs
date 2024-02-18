@@ -54,7 +54,11 @@ fn main() {
 
             getyx(stdscr(), &mut y, &mut x);
             let c = getch() as u8 as char;
-            if c == '\n' { break }
+            if c == '\n' {
+                y += 1;
+                wmove(stdscr(), y, 0);
+                break;
+            }
             s.push(c);
             x += 1;
 
