@@ -18,6 +18,9 @@ impl Game {
                 msg("Your pride refuses to let you run away...\n");
                 self.stage
             }
+            (VerbKind::Strike, NounKind::Dragon) => {
+                Stage::StrikeDragon
+            }
             _ => {
                 oops();
                 self.stage

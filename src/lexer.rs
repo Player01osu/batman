@@ -31,6 +31,9 @@ pub enum NounKind {
     Bathroom,
     Campus,
     Away,
+    Sword,
+    Dragon,
+    Coat,
 
     Dummy,
 }
@@ -43,7 +46,6 @@ pub enum VerbKind {
     Exit,
     Quit,
     Go,
-    Hit,
     Leave,
     Check,
     Continue,
@@ -54,6 +56,8 @@ pub enum VerbKind {
     Do,
     Walk,
     Run,
+    Equip,
+    Strike,
 
     Dummy,
 }
@@ -144,7 +148,6 @@ impl<'a> Lexer<'a> {
             "close" => TokenKind::Verb(VerbKind::Close),
             "exit" => TokenKind::Verb(VerbKind::Exit),
             "go" => TokenKind::Verb(VerbKind::Go),
-            "hit" => TokenKind::Verb(VerbKind::Hit),
             "quit" => TokenKind::Verb(VerbKind::Quit),
             "leave" => TokenKind::Verb(VerbKind::Leave),
             "check" => TokenKind::Verb(VerbKind::Check),
@@ -156,6 +159,8 @@ impl<'a> Lexer<'a> {
             "do" => TokenKind::Verb(VerbKind::Do),
             "walk" => TokenKind::Verb(VerbKind::Walk),
             "run" => TokenKind::Verb(VerbKind::Run),
+            "equip" => TokenKind::Verb(VerbKind::Equip),
+            "hit" | "strike" => TokenKind::Verb(VerbKind::Strike),
 
             // Nouns
             "chair" => TokenKind::Noun(NounKind::Chair),
@@ -174,6 +179,9 @@ impl<'a> Lexer<'a> {
             "bathroom" => TokenKind::Noun(NounKind::Bathroom),
             "campus" => TokenKind::Noun(NounKind::Campus),
             "away" => TokenKind::Noun(NounKind::Away),
+            "sword" => TokenKind::Noun(NounKind::Sword),
+            "dragon" => TokenKind::Noun(NounKind::Dragon),
+            "coat" => TokenKind::Noun(NounKind::Coat),
 
             // Adverbs
             "quick" => TokenKind::Adverb(AdverbKind::Quick),
@@ -186,7 +194,6 @@ impl<'a> Lexer<'a> {
             "far" => TokenKind::Adj(AdjKind::Far),
             "strong" => TokenKind::Adj(AdjKind::Strong),
             "weak" => TokenKind::Adj(AdjKind::Weak),
-            "away" => TokenKind::Adj(AdjKind::Away),
 
             // Articles
             "the" => TokenKind::Article,
@@ -194,6 +201,7 @@ impl<'a> Lexer<'a> {
             "an" => TokenKind::Article,
             "for" => TokenKind::Article,
             "to" => TokenKind::Article,
+            "with" => TokenKind::Article,
 
             _ => TokenKind::Illegal,
         }

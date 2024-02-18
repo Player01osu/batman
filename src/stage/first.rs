@@ -2,10 +2,11 @@ use crate::{game::Game, parser::GameExpr};
 use crate::game::Result;
 use ncurses::*;
 
-use super::Stage;
+use super::{Stage, State};
 
 impl Game {
     pub fn eval_first(&mut self, game: GameExpr) -> Stage {
+        self.state = State::default();
         match game {
             GameExpr::Raw(name) => {
                 self.state.name = name.to_string();

@@ -7,7 +7,7 @@ use crate::lexer::AdverbKind;
 use super::Stage;
 
 fn go_on_foot(verb: VerbKind, noun: NounKind) -> bool {
-    matches!(verb, VerbKind::Walk | VerbKind::Head) &&
+    matches!(verb, VerbKind::Go | VerbKind::Walk | VerbKind::Head) &&
         matches!(noun, NounKind::Campus)
 }
 

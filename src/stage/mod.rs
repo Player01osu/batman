@@ -9,10 +9,12 @@ pub mod outside_library;
 pub mod campus_dragon;
 pub mod bus_fire;
 pub mod bus_arrive;
+pub mod strike_dragon;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Stage {
     First,
+    Finish,
     PlayConfirm,
     Library,
     OutsideLibrary,
@@ -21,6 +23,7 @@ pub enum Stage {
     GameOver,
     CampusDragon,
     BusFire,
+    StrikeDragon,
     Quit,
 }
 
@@ -40,7 +43,7 @@ pub fn possible_nouns(nouns: &[&str]) {
 pub struct State {
     pub name: String,
     pub time_left: i32,
-    pub health: u32,
+    pub health: i32,
     pub armor: u32,
     pub equipment: HashSet<Equipment>,
 }
@@ -96,6 +99,15 @@ impl Game {
                 addstr("Everything is going fine until...\n");
                 addstr("The bus becomes engulfed in flames!\n");
                 ParseMode::Grammar
+            }
+            Stage::StrikeDragon => {
+                addstr("Strike the dragon with what?\n");
+                ParseMode::Grammar
+            }
+            Stage::Finish => {
+                addstr("Grats' on completing the demo...\n");
+                addstr("Would you like to play again?\n");
+                ParseMode::Confirm
             }
             Stage::OutsideLibrary => {
                 addstr("You swing open the door and are hit with a big gust of wind...\n");
@@ -166,10 +178,18 @@ impl Game {
             }
             Stage::GameOver => {
             }
+            Stage::Finish => (),
             Stage::BusFire => {
                 possible_nouns(&["extinguisher"]);
             }
             Stage::CampusDragon => {
+                let mut nouns = vec!["fist", "pen", "dragon"];
+                if self.state.equipment.contains(&Equipment::Sword) {
+                    nouns.push("sword");
+                }
+                possible_nouns(nouns.as_slice());
+            }
+            Stage::StrikeDragon => {
                 let mut nouns = vec!["fist", "pen"];
                 if self.state.equipment.contains(&Equipment::Sword) {
                     nouns.push("sword");

@@ -1,5 +1,6 @@
 use crate::game::msg;
 use crate::game::oops;
+use crate::game::Equipment;
 use crate::game::Game;
 use crate::parser::GameExpr;
 use crate::lexer::VerbKind;
@@ -34,6 +35,16 @@ impl Game {
                 }
                 Stage::OutsideLibrary
             },
+            (VerbKind::Equip, NounKind::Sword) => {
+                msg("You have equipt a large sword...\n");
+                msg("You sense great power running through this sword...\n");
+                self.state.equipment.insert(Equipment::Sword);
+                self.stage
+            }
+            (VerbKind::Equip, NounKind::Coat) => {
+                self.equip_armor(Equipment::Coat, 4, "You have equipt a large winter coat...\n");
+                self.stage
+            }
             (VerbKind::Do, NounKind::Nothing) => {
                 msg("You decide to kill some time...\n");
                 self.adjust_time(-5);

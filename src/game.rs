@@ -74,6 +74,15 @@ impl Game {
         self.is_running
     }
 
+    pub fn equip_armor(&mut self, armor: Equipment, value: u32, s: &str) {
+        if self.state.equipment.insert(armor) {
+            msg(s);
+            self.state.armor += value;
+        } else {
+            msg("You already have this equipt");
+        }
+    }
+
     fn eval_program_exit(&mut self, program: ProgramExpr) {
         match program.noun() {
             NounKind::Game => self.is_running = false,
@@ -89,6 +98,20 @@ impl Game {
     }
 
     fn eval_game_over(&mut self, game: GameExpr) -> Stage {
+        let confirm = match game {
+            GameExpr::Confirm(b) => b,
+            _ => unreachable!(),
+        };
+
+        if confirm {
+            Stage::First
+        } else {
+            Stage::Quit
+        }
+    }
+
+
+    pub fn eval_finish(&mut self, game: GameExpr) -> Stage {
         let confirm = match game {
             GameExpr::Confirm(b) => b,
             _ => unreachable!(),
@@ -130,9 +153,15 @@ impl Game {
             Stage::CampusDragon => {
                 self.eval_campus_dragon(game)
             }
+            Stage::StrikeDragon => {
+                self.eval_strike_dragon(game)
+            }
             Stage::Quit => {
                 Stage::Quit
             }
+            Stage::Finish => {
+                self.eval_finish(game)
+            },
         };
         self.transition(next_stage);
     }
