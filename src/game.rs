@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use ncurses::*;
 
 use crate::{lexer::{NounKind, VerbKind}, parser::{Expr, GameExpr, ParseErr, Parser, ProgramExpr}, stage::{Stage, State}};
@@ -9,6 +11,12 @@ pub struct Game {
     pub name: String,
     pub stage: Stage,
     pub state: State,
+}
+
+#[derive(Copy, Clone, Debug, Hash, PartialEq, Eq)]
+pub enum Equipment {
+    Coat,
+    Sword
 }
 
 #[derive(Clone, Debug)]
@@ -80,6 +88,19 @@ impl Game {
         }
     }
 
+    fn eval_game_over(&mut self, game: GameExpr) -> Stage {
+        let confirm = match game {
+            GameExpr::Confirm(b) => b,
+            _ => unreachable!(),
+        };
+
+        if confirm {
+            Stage::First
+        } else {
+            Stage::Quit
+        }
+    }
+
     fn eval_game(&mut self, game: GameExpr) {
         let next_stage = match self.stage {
             Stage::First => {
@@ -91,18 +112,29 @@ impl Game {
             Stage::Library => {
                 self.eval_library(game)
             }
-            Stage::Quit => {
-                Stage::Quit
-            }
             Stage::OutsideLibrary => {
                 self.eval_outside_library(game)
             }
+            Stage::TransitOnFoot => {
+                Stage::CampusDragon
+            }
+            Stage::BusArrive => {
+                self.eval_bus_arrive(game)
+            }
+            Stage::GameOver => {
+                self.eval_game_over(game)
+            }
+            Stage::BusFire => {
+                self.eval_bus_fire(game)
+            }
+            Stage::CampusDragon => {
+                self.eval_campus_dragon(game)
+            }
+            Stage::Quit => {
+                Stage::Quit
+            }
         };
         self.transition(next_stage);
-    }
-
-    pub fn eval_outside_library(&mut self, game: GameExpr) -> Stage {
-        self.stage
     }
 
     pub fn eval(&mut self, s: &str) {

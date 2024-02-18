@@ -29,6 +29,8 @@ pub enum NounKind {
     Back,
     Nothing,
     Bathroom,
+    Campus,
+    Away,
 
     Dummy,
 }
@@ -50,6 +52,8 @@ pub enum VerbKind {
     Enter,
     Head,
     Do,
+    Walk,
+    Run,
 
     Dummy,
 }
@@ -150,6 +154,8 @@ impl<'a> Lexer<'a> {
             "enter" => TokenKind::Verb(VerbKind::Enter),
             "head" => TokenKind::Verb(VerbKind::Head),
             "do" => TokenKind::Verb(VerbKind::Do),
+            "walk" => TokenKind::Verb(VerbKind::Walk),
+            "run" => TokenKind::Verb(VerbKind::Run),
 
             // Nouns
             "chair" => TokenKind::Noun(NounKind::Chair),
@@ -166,6 +172,8 @@ impl<'a> Lexer<'a> {
             "back" => TokenKind::Noun(NounKind::Back),
             "nothing" => TokenKind::Noun(NounKind::Nothing),
             "bathroom" => TokenKind::Noun(NounKind::Bathroom),
+            "campus" => TokenKind::Noun(NounKind::Campus),
+            "away" => TokenKind::Noun(NounKind::Away),
 
             // Adverbs
             "quick" => TokenKind::Adverb(AdverbKind::Quick),

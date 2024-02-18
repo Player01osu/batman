@@ -42,9 +42,12 @@ impl Game {
             (_, NounKind::Bathroom) => {
                 match verb {
                     VerbKind::Enter => {
-                        msg("You check yourself out in the mirror...\n");
+                        msg("You check yourself out in the bathroom mirror...\n");
                         msg("Man, you look gorgeous...\n");
                         self.adjust_time(-5);
+                    }
+                    _ => {
+                        msg("Maybe you should, uh, enter the bathroom...\n");
                     }
                 }
                 Stage::Library
